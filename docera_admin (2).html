@@ -229,18 +229,18 @@ function renderDash(){
  $('#recentPay').innerHTML=allPays().slice(0,5).map(p=>`<div class="activity-item"><div class="activity-mark">${p.status==='approved'?'✓':p.status==='rejected'?'×':'⌁'}</div><div class="activity-text"><b>${esc(planInfo(p.plan).name)} · ${inr(p.amt)} · ${esc(p.status)}</b><p>${esc(p.user)}</p></div><time>${fmtDT(p.t)}</time></div>`).join('')||'<div class="empty" style="padding:10px">No payments yet</div>';
 }
 function renderPend(){
- const q=($('#pendSearch').value||'').toLowerCase(),rows=Object.entries(pend).map(([pid,p])=>Object.assign({pid},p)).sort((a,b)=>(a.t||0)-(b.t||0)).filter(p=>(p.name+p.email+p.utr).toLowerCase().includes(q));
+ const q=($('#pendSearch').value||'').toLowerCase(),rows=Object.entries(pend).map(([pid,p])=>Object.assign({pid},p)).sort((a,b)=>(a.t||0)-(b.t||0)).filter(p=>[p.name,p.email,p.utr].join(' ').toLowerCase().includes(q));
  $('#pendTable').innerHTML=rows.map(p=>`<tr><td><div class="user-cell"><div class="user-avatar">${esc((p.name||'?')[0].toUpperCase())}</div><div><b>${esc(p.name)}</b><small>${esc(p.email)} · ${esc(p.phone)}</small></div></div></td><td>${esc(planInfo(p.plan).name)}</td><td><b>${p.utr==='FREE'?'FREE':inr(p.amt)}</b>${p.off?`<small style="display:block;color:#888">${esc(p.coupon||p.offer||'offer')} · −${inr(p.off)}${p.list?' · list '+inr(p.list):''}</small>`:''}</td><td class="mono">${esc(p.utr)}</td><td>${esc(p.payer)||'—'}</td><td>${fmtDT(p.t)}</td><td><button class="action ok" data-a="approve" data-id="${esc(p.pid)}">Approve</button> <button class="action no" data-a="reject" data-id="${esc(p.pid)}">Reject</button></td></tr>`).join('')||'<tr><td colspan="7" class="empty">Nothing pending 🎉</td></tr>';
 }
 function renderUsers(){
  const q=($('#userSearch').value||'').toLowerCase(),f=$('#userFilter').value;
- const rows=Object.entries(users).map(([id,u])=>({id,u,p:u.profile||{},s:pstat(u)})).filter(r=>(f==='all'||r.s===f)&&(r.p.name+r.p.email+r.p.phone).toLowerCase().includes(q)).sort((a,b)=>(b.p.seen||0)-(a.p.seen||0));
+ const rows=Object.entries(users).map(([id,u])=>({id,u,p:u.profile||{},s:pstat(u)})).filter(r=>(f==='all'||r.s===f)&&[r.p.name,r.p.email,r.p.phone].join(' ').toLowerCase().includes(q)).sort((a,b)=>(b.p.seen||0)-(a.p.seen||0));
  $('#userCount').textContent='· '+Object.keys(users).length;
  $('#usersTable').innerHTML=rows.map(r=>`<tr><td><div class="user-cell"><div class="user-avatar">${esc((r.p.name||'?')[0].toUpperCase())}</div><div><b>${esc(r.p.name)}</b><small>${esc(r.p.email)}</small></div></div></td><td class="mono" title="${esc(r.id)}"><button class="action" data-a="copyid" data-id="${esc(r.id)}">${esc(r.id.slice(0,6))}… copy</button></td><td>${esc(r.p.phone)||'—'}</td><td>${chipS(r.s)}</td><td>${r.u.premium?fmtD(r.u.premium.exp):'—'}</td><td><button class="action ok" data-a="grant" data-id="${esc(r.id)}">Grant</button> ${r.u.premium?`<button class="action no" data-a="revoke" data-id="${esc(r.id)}">Revoke</button>`:''}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No users</td></tr>';
 }
 function renderPays(){
  const q=($('#paySearch').value||'').toLowerCase(),f=$('#payFilter').value;
- $('#payTable').innerHTML=allPays().filter(p=>(f==='all'||p.status===f)&&(p.user+p.email+p.utr).toLowerCase().includes(q)).map(p=>`<tr><td>${fmtDT(p.t)}</td><td><div class="user-cell"><div><b>${esc(p.user)}</b><small>${esc(p.email)}</small></div></div></td><td>${esc(planInfo(p.plan).name)}</td><td>${inr(p.amt)}</td><td class="mono">${esc(p.utr)}</td><td>${chipS(p.status)}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No payments</td></tr>';
+ $('#payTable').innerHTML=allPays().filter(p=>(f==='all'||p.status===f)&&[p.user,p.email,p.utr].join(' ').toLowerCase().includes(q)).map(p=>`<tr><td>${fmtDT(p.t)}</td><td><div class="user-cell"><div><b>${esc(p.user)}</b><small>${esc(p.email)}</small></div></div></td><td>${esc(planInfo(p.plan).name)}</td><td>${inr(p.amt)}</td><td class="mono">${esc(p.utr)}</td><td>${chipS(p.status)}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No payments</td></tr>';
 }
 let plansDirty=false;
 function renderPlans(){
